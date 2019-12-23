@@ -48,3 +48,31 @@ $ chalice deploy --stage prod
 $ http http://<your-api-url>/todos
 ```
 
+## CI/CD 環境の準備
+chalise でCodeCommitの設定ファイルを作成する。
+```
+$ chalice generate-pipeline pipeline.json -b buildspec.yml
+```
+```
+$ aws cloudformation deploy --stack-name backend-stack --template-name pipeline.json --capabilities CAPABILITIY_IAM
+$ aws cloudformation describe --stack-name backend-stack
+```
+`OutputKey` が `SourceRepoURL` の要素で、その `OutputValue` がリポジトリの URL である
+CodeCommit のリポジトリへAWSの認証情報を付与し、プッシュする
+```
+$ git init .
+$ git config --global credential.helper '!aws codecommit credential-helper $@'
+$ git config --global credential.UseHttpPath true
+$ git add -A .
+$ git commit -m "initial commit"
+$ git remote add codecommit https://<backend-repo-url>
+$ git push codecommit master
+```
+
+### バックエンドの動作確認
+下記コマンドでステージング環境の `URL` を調べ、エンドポイント URL に対して API をコールする。
+```
+$ aws cloudformation describe-stacks --stack-name backendBetaStack
+$ http https://<your-staging-api-url>/todos
+```
+
