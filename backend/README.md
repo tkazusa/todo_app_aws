@@ -75,4 +75,8 @@ $ git push codecommit master
 $ aws cloudformation describe-stacks --stack-name backendBetaStack
 $ http https://<your-staging-api-url>/todos
 ```
-
+## テスト
+`pytest` を使ってユニットテストを実行します
+```
+pytest tests/unit
+```
